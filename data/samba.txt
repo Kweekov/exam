@@ -1,0 +1,17 @@
+# Удаляем конфиг
+rm -f /etc/samba/smb.conf
+
+# Provision domain
+samba-tool domain provision --use-rfc2307 --interactive
+
+# Пароль: P@ssw0rd, DNS: NONE (samba-internal)
+
+# Копируем Kerberos конфиг
+cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+
+# Запускаем самбу
+systemctl enable --now samba.service
+
+# Проверка статуса
+systemctl status samba.service
+...
