@@ -1,17 +1,42 @@
-# Удаляем конфиг
-rm -f /etc/samba/smb.conf
+# SAMBA
 
-# Provision domain
+[На br-srv]
+rm -f /etc/samba/smb.conf
 samba-tool domain provision --use-rfc2307 --interactive
 
-# Пароль: P@ssw0rd, DNS: NONE (samba-internal)
+# При вводе: DNS = NONE (где samba-internal), пароль = P@ssw0rd
 
-# Копируем Kerberos конфиг
 cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
-
-# Запускаем самбу
 systemctl enable --now samba.service
 
-# Проверка статуса
+nano /etc/samba/smb.conf
+[global]
+dns forwarder = 192.168.0.1
+
+systemctl restart samba.service
 systemctl status samba.service
-...
+
+# Создание пользователей:
+samba-tool user create user1.hq "P@ssw0rd" --home-directory=/home/AU-TEAM/user1.hq --uid=user1.hq
+# (добавить user2.hq и т.д.)
+
+samba-tool group add hq
+samba-tool group addmembers hq user1.hq
+samba-tool group addmembers "Account Operators" hq
+samba-tool group addmembers "Allowed RODC Password Replication Group" hq
+
+# Перезагрузка самбы и сервера
+
+[На hq-srv]
+nano /etc/bind/zone/au-team.irpo
+# Вторая IN строка — заменить на IP br-srv: 192.168.3.1
+
+systemctl restart bind
+
+[На клиенте]
+realm join -U user1.hq au-team.irpo
+echo "%hq ALL=(ALL) NOPASSWD: /bin/cat,/bin/id,/bin/grep" > /etc/sudoers.d/hq
+
+# Если самба не встала:
+rm -rf /var/lib/samba
+rm -rf /var/cache/samba

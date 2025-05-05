@@ -1,0 +1,37 @@
+# ANSIBLE
+
+# На всех КРОМЕ br-srv:
+systemctl enable --now sshd.service
+systemctl restart sshd.service
+systemctl status sshd.service  # Посмотреть порт
+
+# Проверка IP (на br-srv):
+ip -c -br a
+
+# Подключение к машинам (примеры):
+ssh sshuser@192.168.0.1 -p 2024         # HQ SRV, пароль: P@ssw0rd
+ssh user@192.168.0.65 -p 22             # HQ CLI, пароль: P@ssw0rd
+ssh net_admin@192.168.0.62 -p 22        # HQ RTR, пароль: P@ssw0rd
+ssh net_admin@192.168.1.30 -p 22        # BR RTR, пароль: P@$$word
+
+# Генерация ключей:
+ssh-keygen -t rsa
+# (3 раза Enter)
+
+# Копирование ключей (для каждого хоста):
+ssh-copy-id sshuser@192.168.0.1 -p 2024
+# Повторить для каждого IP
+
+# Если ошибка:
+rm .ssh/known_hosts
+
+# Конфиг инвентаря:
+nano /etc/ansible/inv
+
+# Конфигурация Ansible:
+nano /etc/ansible/ansible.cfg
+# В [defaults] добавить:
+interpreter_python=auto_silent
+
+# Проверка соединения:
+ansible all -i /etc/ansible/inv -m ping

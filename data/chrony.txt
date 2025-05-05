@@ -1,0 +1,20 @@
+# CHRONY
+
+[На hq-rtr]
+nano /etc/chrony.conf
+
+Server 127.0.0.1 iburst prefer
+allow 192.168.0.0/26
+allow 192.168.0.64/27
+allow 192.168.3.0/27 (возможно 192.168.1.0/27)
+
+systemctl enable --now chronyd
+systemctl status chronyd.service
+
+[На hq-srv (клиент)]
+nano /etc/chrony.conf
+Server 192.168.0.62 iburst prefer
+
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources

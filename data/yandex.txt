@@ -1,0 +1,4 @@
+# Установка Yandex Browser (на клиенте)
+
+apt-get update
+apt-get install yandex-browser -y

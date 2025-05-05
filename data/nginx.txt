@@ -1,0 +1,10 @@
+# NGINX
+
+apt-get install nginx -y
+nano /etc/nginx/nginx.conf
+
+systemctl disable --now ahttpd.service
+systemctl disable --now httpd2.service
+
+systemctl restart nginx.service
+systemctl status nginx.service

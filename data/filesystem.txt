@@ -1,0 +1,44 @@
+# Файловая система
+
+[На hq-srv]
+lsblk
+fdisk /dev/sda  # Для всех кроме swap:
+g
+n
+Enter x3
+w
+
+mdadm --create --verbose /dev/md0 -l 5 -n 3 /dev/sda1 /dev/sdb1 /dev/sdc1
+mkfs.ext4 /dev/md0
+
+mkdir /raid5
+mount /dev/md0 /raid5
+
+nano /etc/fstab
+# Добавить строку:
+# /dev/md0    /raid5    ext4    defaults    0    0
+
+df -h
+
+# Сетевой доступ по NFS:
+nano /etc/exports
+# Добавить строку:
+# /raid5/nfs 192.168.0.64/28(rw,subtree_check)
+
+mkdir /raid5/nfs
+systemctl enable --now nfs-server
+# Если не работает:
+# apt-get install nfs-server -y
+
+exportfs -a
+touch /raid5/nfs/test.txt
+chmod 777 -R /raid5/nfs
+
+[На клиенте]
+mkdir /mnt/nfs
+nano /etc/fstab
+# Добавить строку:
+# 192.168.0.1:/raid5/nfs    /mnt/nfs    nfs    auto    0    0
+
+mount -t nfs 192.168.0.1:/raid5/nfs/ /mnt/nfs/
+ls /mnt/nfs

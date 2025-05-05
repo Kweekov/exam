@@ -1,0 +1,20 @@
+# Статическая маршрутизация
+
+apt-get install nftables -y
+
+[На br-rtr]
+nano /etc/exports
+# Вставить:
+# net.ipv4.ip_forward=1
+
+nano /etc/nftables/nftables.nft
+systemctl enable --now nftables.service
+systemctl status nftables.service
+
+[На hq-rtr] (аналогично)
+nano /etc/exports
+# net.ipv4.ip_forward=1
+
+nano /etc/nftables/nftables.nft
+systemctl enable --now nftables.service
+systemctl status nftables.service
