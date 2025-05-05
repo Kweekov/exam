@@ -9,12 +9,19 @@ systemctl status sshd.service  # Посмотреть порт
 ip -c -br a
 
 # Подключение к машинам (примеры):
-ssh sshuser@192.168.0.1 -p 2024         # HQ SRV, пароль: P@ssw0rd
-ssh user@192.168.0.65 -p 22             # HQ CLI, пароль: P@ssw0rd
-ssh net_admin@192.168.0.62 -p 22        # HQ RTR, пароль: P@ssw0rd
-ssh net_admin@192.168.1.30 -p 22        # BR RTR, пароль: P@$$word
+HQ SRV sshuser@192.168.0.1 -p 2024         # HQ SRV, пароль: P@ssw0rd
+HQ CLI user@192.168.0.65 -p 22             # HQ CLI, пароль: P@ssw0rd
+HQ RTR net_admin@192.168.0.62 -p 22        # HQ RTR, пароль: P@ssw0rd
+BR RTR net_admin@192.168.1.30 -p 22        # BR RTR, пароль: P@$$word
 
-# Генерация ключей:
+#ssh sshuser@192.168.0.1 -p 2024 
+
+вместо серого вставить то, что выше написала фиолетовым ЭТУ КОМАНДУ 
+НАДО ПРОПИСАТЬ 4 РАЗА МЕНЯЯ ТО, ЧТО В СЕРОМ ДЛЯ КАЖДОГО ПОЛЬЗОВАТЕЛЯ, 
+КОТОРОГО ХОТИМ ПОДКЛЮЧИТЬ 
+yes
+пароль, соответствующий пользователю
+
 ssh-keygen -t rsa
 # (3 раза Enter)
 
@@ -27,6 +34,14 @@ rm .ssh/known_hosts
 
 # Конфиг инвентаря:
 nano /etc/ansible/inv
+
+[hq]
+("tab")192.168.0.1 ansible_port=2024 ansible_user = sshuser
+("tab")192.168.0.65 ansible_port=22 ansible_user = user
+("tab")192.168.0.62 ansible_port=22 ansible_user = net_admin
+[br]
+("tab")192.168.1.30 ansible_port=22 ansible_user = net_admin
+
 
 # Конфигурация Ansible:
 nano /etc/ansible/ansible.cfg

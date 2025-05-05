@@ -3,6 +3,22 @@
 apt-get install nginx -y
 nano /etc/nginx/nginx.conf
 
+Добавить в http:
+server {
+    listen 80;
+    server_name moodle.au-team.irpo;
+    location / {
+        proxy_pass http://192.168.0.1:80;
+    }
+}
+server {
+    listen 80;
+    server_name wiki.au-team.irpo;
+    location / {
+        proxy_pass http://192.168.0.1:8080;
+    }
+}
+
 systemctl disable --now ahttpd.service
 systemctl disable --now httpd2.service
 

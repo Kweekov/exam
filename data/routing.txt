@@ -4,17 +4,41 @@ apt-get install nftables -y
 
 [На br-rtr]
 nano /etc/exports
-# Вставить:
-# net.ipv4.ip_forward=1
-
+net.ipv4...forward=1
 nano /etc/nftables/nftables.nft
+
+Отступ от таблицы
+table inet nat {
+    chain postrouting{
+        type nat hook postrouting priority srcnat;
+        oifname "ens19(это номер интерфейса смотреть в ip -c -br a)" masquerade
+    }
+    chain prerouting{
+        type nat hook prerouting priority filter;
+        ip daddr 172.16.5.1 tcp dport 80 dnat ip to 192.168.1.1:8080
+        ip daddr 172.16.5.1 tcp dport 22 dnat ip to 192.168.1.1:2024
+    }
+}
+
 systemctl enable --now nftables.service
 systemctl status nftables.service
 
 [На hq-rtr] (аналогично)
 nano /etc/exports
-# net.ipv4.ip_forward=1
-
+# net.ipv4...forward=1
 nano /etc/nftables/nftables.nft
+
+Отступ от таблицы
+table inet nat {
+    chain postrouting{
+        type nat hook postrouting priority srcnat;
+        oifname "ens19(это номер интерфейса смотреть в ip -c -br a)" masquerade
+    }
+    chain prerouting{
+        type nat hook prerouting priority filter;
+        ip daddr 172.16.5.1 tcp dport 22 dnat ip to 192.168.1.1:2024
+    }
+}
+
 systemctl enable --now nftables.service
 systemctl status nftables.service
